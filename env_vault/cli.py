@@ -1,4 +1,4 @@
-"""CLI entry point for env-vault."""
+# env-vault CLI
 
 import click
 import sys
@@ -21,16 +21,7 @@ def _get_provider(kms_key_id, password, env_file):
 @click.group()
 @click.version_option(version="1.0.0")
 def cli():
-    """env-vault — Encrypt .env files for safe Git storage.
-
-    Lock your secrets into an encrypted .vault file,
-    unlock them on any machine with the right key.
-
-    \b
-    Providers:
-      • Local (default) — password-based AES-256 encryption
-      • AWS KMS         — use --kms-key-id
-    """
+    """env-vault — AES-256 CLI for .env files."""
     pass
 
 

@@ -8,14 +8,9 @@
 
 ---
 
-## 🔐 The Problem
+## Overview
 
-`.env` files contain database credentials, API keys, and service tokens. Most teams either:
-- **Commit them to Git** (catastrophic security risk 🚨)
-- **Share them on Slack/email** (no audit trail, easy to stale)
-- **Use heavy secret managers** (overkill for small teams)
-
-`env-vault` is the **lightweight middle ground**: one command to encrypt, one to decrypt, a single `.vault` file you can safely commit.
+`env-vault` is a lightweight CLI for encrypting `.env` files using AES-256 for safe storage in your Git repositories. It bridges the gap between committing plaintext secrets and using heavy secrets management infrastructure.
 
 ---
 
@@ -111,11 +106,45 @@ env-vault lock --kms-key-id arn:aws:kms:us-east-1:123456789:key/my-key-id
 
 # Unlock with KMS
 env-vault unlock --kms-key-id arn:aws:kms:us-east-1:123456789:key/my-key-id
-
-# Or set the env var
-export VAULT_KMS_KEY_ID=arn:aws:kms:us-east-1:123456789:key/my-key-id
-env-vault lock
 ```
+
+---
+
+## 🔄 Key Rotation
+
+Rotating keys or passwords is straightforward with `env-vault`:
+
+1.  **Unlock** your current vault using the old password/key:
+    `env-vault unlock --vault-file old.vault`
+2.  **Lock** the generated `.env` file using the new password/key:
+    `env-vault lock --vault-file new.vault --password new-pass`
+3.  **Replace** the old vault file in Git.
+
+> [!NOTE]
+> If using AWS KMS, rotating the CMK (Customer Master Key) in AWS doesn't require a re-encryption of the vault if the key ARN remains the same and you utilize KMS key rotation.
+
+---
+
+## 👥 Team Workflow
+
+`env-vault` is built for small, agile teams. A typical workflow looks like:
+
+1.  **Password Management**: Use a shared vault (1Password or Bitwarden) to store the master `VAULT_PASSWORD`.
+2.  **Development**: Developers clone the repo and run `env-vault unlock` to get started. 
+3.  **Updates**: When secrets change, one developer updates the `.env`, runs `env-vault lock`, and commits the updated `.vault` file.
+4.  **CI/CD**: Inject the `VAULT_PASSWORD` as a secret variable in your CI platform (GitHub Actions, GitLab CI, etc.).
+
+---
+
+## 🆚 Comparison
+
+| Feature | env-vault | git-crypt | sops |
+|---------|-----------|-----------|------|
+| Simple CLI | ✅ | ❌ | ❌ |
+| KMS native | ✅ | ❌ | ✅ |
+| No infra | ✅ | ✅ | ❌ |
+
+---
 
 ---
 

@@ -1,4 +1,4 @@
-"""AES-256 encryption/decryption for env-vault using Fernet (cryptography library)."""
+# Fernet-based symmetric encryption layer
 
 import os
 import base64
